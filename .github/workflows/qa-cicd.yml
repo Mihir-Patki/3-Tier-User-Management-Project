@@ -1,0 +1,37 @@
+name: Enterprise DevSecOps CICD Pipeline
+on: 
+  push:
+    branches:
+      - qa
+    paths:
+      - client/**
+      - server/**
+      - .github/workflows/qa-cicd.yml
+
+jobs:
+  gitleaks-scan: #job id / kind of discription / this can be used /called in other piece of pipeline code
+    name: Gitleaks Scan # just label name for our jib
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout source code
+        uses: actions/checkout@v4
+
+      - name: Run Gitleaks Scan
+        run:  |
+          docker run --rm \
+            -v "${{ github.workspace }}:/repo" \
+            zricethezav/gitleaks:latest detect \
+            --source=/repo \
+            --report-format=json \
+            --report-path=/repo/gitleaks-report.json \
+            --redact \
+            --exit-code 0
+
+      - name: Upload Gitleaks Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-report
+          path: gitleaks-report.json
+          if-no-files-found: warn
+      
+  
