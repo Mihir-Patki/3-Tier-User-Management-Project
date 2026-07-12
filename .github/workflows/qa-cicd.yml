@@ -55,8 +55,8 @@ jobs:
      - name: Upload checkov Terraform Report
        uses: actions/upload-artifact@v4
        with:
-         name: checkov-terrform-report
-         path: checkov-terraform-report.json
+         name: checkov-terraform-report
+         path: checkov-terraform.json
          if-no-files-found: warn
 
 
@@ -74,7 +74,7 @@ jobs:
          python-version: "3.11"
      - name: Install checkov
        run: pip install checkov
-     - name: Run Checkov Terraform Scan
+     - name: Run Checkov Kubernetes Scan
        run:  |
          checkov -d . \
            --framework kubernetes \
@@ -83,7 +83,7 @@ jobs:
        uses: actions/upload-artifact@v4
        with:
          name: checkov-k8s-report
-         path: checkov-k8s-report.json
+         path: checkov-k8s.json
          if-no-files-found: warn
 
 
@@ -109,5 +109,5 @@ jobs:
        uses: actions/upload-artifact@v4
        with:
          name: checkov-dockerfile-report
-         path: checkov-dockerfile-report.json
+         path: checkov-dockerfile.json
          if-no-files-found: warn
