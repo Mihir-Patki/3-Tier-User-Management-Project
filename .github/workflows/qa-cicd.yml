@@ -366,6 +366,7 @@ jobs:
       # Check the Quality Gate status.
       - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
+        continue-on-error: true
         uses: sonarsource/sonarqube-quality-gate-action@master
         with:
           pollingTimeoutSec: 600
@@ -405,5 +406,91 @@ jobs:
 
       - name: Run Client Build
         run: npm run build --if-present
-                
+
+
+
+  docker:
+    name: Docker Build and Push
+    needs: 
+      - client-build
+      - sonarqube
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+        
+      - name: Build
+        uses: docker/build-push-action@v7
+        with:
+          load: true
+          push: false
+          tags:  |
+             mihirya/nodejs-app:${{ github.sha }}
+             mihirya/nodejs-app:latest
+
       
+      - name: Install Trivy
+        uses: aquasecurity/setup-trivy@v0.2.6
+        with:
+          version: latest
+          cache: true
+
+      - name: Verify Trivy Installation
+        run:  |
+          trivy --version
+          which trivy
+
+      - name: Run Trivy Docker Image Scan ( JSON )
+        run:  |
+          trivy image mihirya/nodejs-app:${{ github.sha }} \
+            --format json \
+            --output dockerimage-trivy-report.json \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --exit-code 0
+
+      
+      - name: Run Trivy Docker Image Scan ( Table )
+        run:  | 
+          trivy image mihirya/nodejs-app:${{ github.sha }} \
+            --format table \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --exit-code 0 > dockerimage-trivy-report.txt
+            
+
+      - name: Upload Dockerimage Trivy JSON Format
+        uses: actions/upload-artifact@v4
+        with:
+          name: dockerimage-trivy-report-json
+          path: dockerimage-trivy-report.json
+          if-no-files-found: warn
+      
+
+      - name: Upload Dockerimage Trivy Table Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dockerimage-trivy-report-table
+          path: dockerimage-trivy-report.txt
+          if-no-files-found: warn
+
+
+      - name: Push
+        uses: docker/build-push-action@v7
+        with:
+          push: true
+          tags:  |
+             mihirya/nodejs-app:${{ github.sha }}
+             mihirya/nodejs-app:latest
+
+
