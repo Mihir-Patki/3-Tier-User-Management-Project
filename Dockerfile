@@ -4,7 +4,7 @@ WORKDIR /usr/src/app/client
 COPY client/package*.json ./
 RUN npm install
 COPY client/ ./
-RUN npm run build
+RUN npm build
 
 
 # Stage 2 -- Pruduction Server
