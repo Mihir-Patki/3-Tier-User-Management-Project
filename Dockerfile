@@ -2,6 +2,8 @@
 FROM node:20-alpine AS client-builder
 WORKDIR /usr/src/app/client
 COPY client/package*.json ./
+RUN npm install
+COPY client/ ./
 RUN npm run build
 
 
@@ -13,7 +15,7 @@ RUN npm install --omit=dev
 COPY server/ ./
 
 # Copy only the built client assets from stage 1
-COPY --from=client-builder /usr/src/client/public ./public
+COPY --from=client-builder /usr/src/app/client/public ./public
 
 ENV NODE_ENV=production
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
