@@ -17,7 +17,7 @@ spec:
       - name: regcred
       containers:
       - name: nodejs-app
-        image: mihirya/nodejs-app:ae5fe45cd7d8481cea9aa50aa551a2250b63eafc
+        image: mihirya/nodejs-app:3bb35092f1dcee9a033a73b51d44584094f322f5
         ports:
         - containerPort: 5000
         env:
