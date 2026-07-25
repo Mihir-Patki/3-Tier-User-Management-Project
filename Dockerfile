@@ -15,7 +15,7 @@ RUN npm install --omit=dev
 COPY server/ ./
 
 # Copy only the built client assets from stage 1
-COPY --from=client-builder /usr/src/app/client/public ./public
+COPY --from=client-builder /usr/src/app/client/public /usr/src/app/client/public
 
 ENV NODE_ENV=production
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
