@@ -12,7 +12,7 @@ metadata:
 spec:
   ingressClassName: alb
   rules:
-    - host: valarmorghulis.shop
+    - host: qa.valarmorghulis.shop
       http:
         paths:
           - path: /
