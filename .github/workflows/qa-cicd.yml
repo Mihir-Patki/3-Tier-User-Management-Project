@@ -9,7 +9,7 @@ on:
       - .github/workflows/qa-cicd.yml
 
 permissions: 
-   contents: write
+   contents: write #required for OIDC
    id-token: write
 
 jobs:
