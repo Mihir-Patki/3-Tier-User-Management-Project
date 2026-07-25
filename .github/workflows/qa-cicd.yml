@@ -546,7 +546,7 @@ jobs:
 
 
 
-  deploy-to-k8s:
+  deploy-to-k8s: #application deployment on cluster
     name: Deploy To Kubernetes
     runs-on: ubuntu-latest
     needs: update-qa-manifest
